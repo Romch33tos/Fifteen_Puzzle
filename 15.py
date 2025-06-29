@@ -72,6 +72,28 @@ class FifteenPuzzle:
       for col in range(self.grid_size):
         self.tile_buttons[row][col].configure(state="disabled")
 
+  def restart_game(self):
+    confirm = mb.askyesno("Новая игра", "Вы действительно хотите начать заново?")
+    if confirm:
+      self.tiles = list(range(1, self.grid_size * self.grid_size)) + [None]
+      self.shuffle_tiles()
+      self.update_ui()
+  
+  def shuffle_tiles(self):
+    shuffle(self.tiles)
+    while not self.is_solvable():
+      shuffle(self.tiles)
+    self.update_ui()
+  
+  def is_solvable(self):
+    inversions = 0
+    flat_board = [index for index in self.tiles if index is not None]
+    for row in range(len(flat_board)):
+      for column in range(row + 1, len(flat_board)):
+        if flat_board[row] > flat_board[column]:
+          inversions += 1
+    return inversions % 2 == 0
+
 if __name__ == "__main__":
   ctk.set_appearance_mode("system")
   ctk.set_default_color_theme("blue")
