@@ -41,24 +41,36 @@ class FifteenPuzzle:
       self.tile_buttons.append(button_row)
     self.update_ui()
 
-def update_ui(self):
-  for row in range(self.grid_size):
-    for col in range(self.grid_size):
-      index = row * self.grid_size + col
-      if self.tiles[index] is None:
-        self.tile_buttons[row][col].configure(text="", state="disabled")
-      else:
-        self.tile_buttons[row][col].configure(text=str(self.tiles[index]), state="normal")
+  def update_ui(self):
+    for row in range(self.grid_size):
+      for col in range(self.grid_size):
+        index = row * self.grid_size + col
+        if self.tiles[index] is None:
+          self.tile_buttons[row][col].configure(text="", state="disabled")
+        else:
+          self.tile_buttons[row][col].configure(text=str(self.tiles[index]), state="normal")
+  
+  def handle_move(self, row, col):
+    empty_index = self.tiles.index(None)
+    empty_row, empty_col = divmod(empty_index, self.grid_size)
+  
+    if (abs(empty_row - row) == 1 and empty_col == col) or (abs(empty_col - col) == 1 and empty_row == row):
+      self.tiles[empty_index], self.tiles[row * self.grid_size + col] = self.tiles[row * self.grid_size + col], self.tiles[empty_index]
+      self.update_ui()
+      if self.check_win():
+        self.show_win_message()
 
-def handle_move(self, row, col):
-  empty_index = self.tiles.index(None)
-  empty_row, empty_col = divmod(empty_index, self.grid_size)
-
-  if (abs(empty_row - row) == 1 and empty_col == col) or (abs(empty_col - col) == 1 and empty_row == row):
-    self.tiles[empty_index], self.tiles[row * self.grid_size + col] = self.tiles[row * self.grid_size + col], self.tiles[empty_index]
-    self.update_ui()
-    if self.check_win():
-      self.show_win_message()
+  def check_win(self):
+    return self.tiles == list(range(1, self.grid_size * self.grid_size)) + [None]
+  
+  def show_win_message(self):
+    mb.showinfo("Конец игры!", "Вы победили!")
+    self.disable_tiles()
+  
+  def disable_tiles(self):
+    for row in range(self.grid_size):
+      for col in range(self.grid_size):
+        self.tile_buttons[row][col].configure(state="disabled")
 
 if __name__ == "__main__":
   ctk.set_appearance_mode("system")
